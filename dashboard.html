@@ -287,7 +287,7 @@ function chargerMenuAdmin(){
     if(!menuCats.length){el.innerHTML='<div class="vide">Aucune catégorie.</div>';return}
     el.innerHTML=menuCats.map(function(c){
       var mp=menuPlats.filter(function(p){return p.categorie_id===c.id});
-      var h='<div class="cat-bloc"><div class="cat-titre"><h3>'+esc(c.emoji||"")+" "+esc(c.nom)+(c.actif?"":" (masquée)")+"</h3><span class='ligne'></span>"+
+      var h='<div class="cat-bloc"><div class="cat-titre"><h3>'+esc(c.nom)+(c.actif?"":" (masquée)")+"</h3><span class='ligne'></span>"+
         '<button class="btn btn-s" onclick="editerCategorie(\''+c.id+'\')">✏️</button><button class="btn btn-d" onclick="supprimerCategorie(\''+c.id+'\')">🗑️</button></div>';
       h+=mp.length?mp.map(function(p){
         return '<div class="plat'+(p.disponible?"":" epuise")+'"><div class="p-info"><div class="p-nom">'+esc(p.nom)+'</div><div class="p-desc">'+esc(p.description)+"</div></div><span class='p-prix'>"+Number(p.prix).toFixed(0)+"$</span>"+
@@ -301,16 +301,16 @@ function modal(h){$("modal").innerHTML=h;$("modal-fond").classList.add("on")}
 function fermerModal(){$("modal-fond").classList.remove("on")}
 
 function editerCategorie(id){
-  var c=id?menuCats.find(function(x){return x.id===id}):{nom:"",emoji:"🍽️",ordre:menuCats.length,actif:true};
+  var c=id?menuCats.find(function(x){return x.id===id}):{nom:"",emoji:"",ordre:menuCats.length,actif:true};
   modal('<h3>'+(id?"Modifier":"Nouvelle")+' catégorie</h3>'+
     '<div class="champ"><label>Nom</label><input id="m-nom" value="'+ea(c.nom)+'"></div>'+
-    '<div class="champ"><label>Emoji</label><input id="m-emoji" value="'+ea(c.emoji)+'"></div>'+
+    
     '<div class="champ"><label>Ordre</label><input id="m-ordre" type="number" value="'+(c.ordre||0)+'"></div>'+
     '<label class="check"><input type="checkbox" id="m-actif" '+(c.actif?"checked":"")+'> Visible sur le menu</label>'+
     '<div class="m-actions"><button class="btn btn-s" onclick="fermerModal()">Annuler</button><button class="btn btn-p" onclick="sauverCategorie('+(id?"'"+id+"'":"null")+')">Enregistrer</button></div>');
 }
 function sauverCategorie(id){
-  var d={restaurant_slug:SLUG,nom:$("m-nom").value.trim(),emoji:$("m-emoji").value.trim(),ordre:parseInt($("m-ordre").value)||0,actif:$("m-actif").checked};
+  var d={restaurant_slug:SLUG,nom:$("m-nom").value.trim(),emoji:"",ordre:parseInt($("m-ordre").value)||0,actif:$("m-actif").checked};
   if(!d.nom){toast("Le nom est requis");return}
   (id?sb("categories?id=eq."+id,{method:"PATCH",body:d}):sb("categories",{method:"POST",body:d})).then(function(){fermerModal();toast("Catégorie enregistrée ✓");chargerMenuAdmin()}).catch(function(e){toast("Échec : "+e.message)});
 }
